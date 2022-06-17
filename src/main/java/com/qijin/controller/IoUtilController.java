@@ -30,7 +30,6 @@ import java.io.FileInputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.file.Paths;
-import java.util.Map;
 
 @Api(tags = "Biz:IoUtilController", description = "管理功能")
 @RestController
@@ -92,7 +91,7 @@ public class IoUtilController {
 
     @PostMapping(value = "/fileToMulFile")
     @ApiOperation("fileToMulFile")
-    public void fileToMulFile(@RequestBody DownPdfPictureVO downPdfPictureVO) throws Exception {
+    public void fileToMulFile(@RequestBody DownPdfPictureVO downPdfPictureVO) {
 
         File tempDir = Files.createTempDir();
         String fileName = downPdfPictureVO.getFilename().replace(".", "").replace("*", "x")
