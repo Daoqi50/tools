@@ -60,7 +60,7 @@ public class IoUtilController {
                 PDPageTree pages = doc.getPages();
                 int pageCount = pages.getCount();
                 for (int i = 0; i < pageCount; i++) {
-                    BufferedImage bim = pdfRenderer.renderImageWithDPI(i, 100);
+                    BufferedImage bim = pdfRenderer.renderImageWithDPI(i, 200);
                     os = new ByteArrayOutputStream();
                     ImageIO.write(bim, "jpg", os);
                     byte[] dataList = os.toByteArray();
