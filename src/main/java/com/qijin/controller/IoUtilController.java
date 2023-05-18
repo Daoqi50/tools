@@ -37,58 +37,6 @@ import java.nio.file.Paths;
 public class IoUtilController {
 
 
-    @PostMapping(value = "/convertPic")
-    @ApiOperation("pdf转pic")
-    public void convertPic(@RequestParam("file") MultipartFile file, HttpServletResponse response) throws Exception {
-        File tempDir = Files.createTempDir();
-        File pdfFile = Paths.get(tempDir.getPath(), "tmp.pdf").toFile();
-        File docxFile = Paths.get(tempDir.getPath(), "tmp.docx").toFile();
-        File zipFile = Paths.get(tempDir.getPath(), "file.zip").toFile();
-        byte[] bytes = file.getBytes();
-        Files.write(bytes, pdfFile);
-        if (pdfFile.exists()) {
-            File pictureDir = Paths.get(tempDir.getPath(), "picture").toFile();
-            pictureDir.mkdirs();
-
-            PDDocument doc = null;
-            ByteArrayOutputStream os = null;
-            try {
-                // 加载解析PDF文件
-                doc = PDDocument.load(pdfFile);
-                doc.save(docxFile);
-                PDFRenderer pdfRenderer = new PDFRenderer(doc);
-                PDPageTree pages = doc.getPages();
-                int pageCount = pages.getCount();
-                for (int i = 0; i < pageCount; i++) {
-                    BufferedImage bim = pdfRenderer.renderImageWithDPI(i, 200);
-                    os = new ByteArrayOutputStream();
-                    ImageIO.write(bim, "jpg", os);
-                    byte[] dataList = os.toByteArray();
-                    //图片路径
-                    File newFile = Paths.get(pictureDir.getPath(), i + ".jpg").toFile();
-                    Files.write(dataList, newFile);
-                }
-                ZipUtil.zip(Paths.get(tempDir.getPath(), "file.zip").toFile(), false, pictureDir);
-
-            } catch (Exception e) {
-                throw new RuntimeException("转换pdf失败", e);
-            } finally {
-                if (doc != null) doc.close();
-                if (os != null) os.close();
-            }
-
-            try(FileInputStream fileInputStream = new FileInputStream(zipFile); final ServletOutputStream outputStream = response.getOutputStream();) {
-                response.reset();
-                response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
-                response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(zipFile.getName(), "utf-8"));
-                IoUtil.copy(fileInputStream, outputStream);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        FileUtils.deleteDirectory(tempDir);
-    }
-
     @PostMapping(value = "/fileToMulFile")
     @ApiOperation("fileToMulFile")
     public void fileToMulFile(@RequestBody DownPdfPictureVO downPdfPictureVO) {
